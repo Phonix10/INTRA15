@@ -22,7 +22,7 @@ for i in l:
 
     # --- Date Range ---
     end_date = datetime.now()
-    start_date = end_date - timedelta(days=60)
+    start_date = end_date - timedelta(days=730)
 
     print(f"Fetching {interval} data for {symbol} from {start_date.date()} to {end_date.date()}...")
 
