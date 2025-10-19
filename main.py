@@ -13,10 +13,12 @@ df = pd.read_excel(file_path)
 print("Columns:", df.columns.tolist())  # optional — to verify column names
 
 # If the symbol column is the 2nd column (index 1)
-for symbols in df.iloc[:, 1]:
-    print(symbols)
-    symbol =  symbols + ".NS"           # Stock symbol
-    interval = '5m'            # Interval (1m, 5m, 15m, 1h, 1d, etc.)
+l = ['1m', '5m', '15m', '1h', '1d']
+for i in l:
+    # for symbols in df.iloc[:, 1]:
+    # print(symbols)
+    symbol =  "HDFCBANK" + ".NS"           # Stock symbol
+    interval = i            # Interval (1m, 5m, 15m, 1h, 1d, etc.)
 
     # --- Date Range ---
     end_date = datetime.now()
