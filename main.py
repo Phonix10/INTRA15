@@ -16,7 +16,7 @@ print("Columns:", df.columns.tolist())  # optional — to verify column names
 for symbols in df.iloc[:, 1]:
     print(symbols)
     symbol =  symbols + ".NS"           # Stock symbol
-    interval = '15m'            # Interval (1m, 5m, 15m, 1h, 1d, etc.)
+    interval = '5m'            # Interval (1m, 5m, 15m, 1h, 1d, etc.)
 
     # --- Date Range ---
     end_date = datetime.now()
