@@ -1,52 +1,71 @@
 import pandas as pd
-from tiingo import TiingoClient
+import yfinance as yf
 from datetime import datetime, timedelta
 
-# Tiingo API key configuration
-config = {
-    'api_key': '717d713804ee57c4c0d4340edb6e9f0b34f40fe8'
-}
+# --- Configuration ---
+# Symbol (any stock symbol from Yahoo Finance)
+symbol = 'AAPL'
+# Interval for the data. Options: 1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo
+interval = '15m'
 
-client = TiingoClient(config)
-
-# Time range: only last 30 days for intraday data
+# --- Date Range Calculation ---
+# yfinance allows fetching intraday data for the last 60 days.
+# We will fetch data for the last 30 days as in the original script.
 end_date = datetime.now()
 start_date = end_date - timedelta(days=30)
 
-# Symbol (US stock only)
-symbol = 'AAPL'
-print(f"Fetching 15-min data for {symbol} from {start_date.date()} to {end_date.date()}...")
+print(f"Fetching {interval} data for {symbol} from {start_date.date()} to {end_date.date()}...")
 
-# Fetch 15-min interval data
-data = client.get_dataframe(
-    symbol,
-    startDate=start_date.strftime('%Y-%m-%d'),
-    endDate=end_date.strftime('%Y-%m-%d') ,
-    frequency='15Min'
+# --- Fetch Data from Yahoo Finance ---
+# The yf.download() function returns a pandas DataFrame.
+# We set auto_adjust=False to get the 'Adj Close' column, though we don't use it here.
+data = yf.download(
+    tickers=symbol,
+    start=start_date,
+    end=end_date,
+    interval=interval,
+    auto_adjust=False, # Set to False to get Adj Close
+    progress=False # Hides the download progress bar
 )
 
-# Rename columns to clean format
-data = data.rename(columns={
-    'open': 'Open',
-    'high': 'High',
-    'low': 'Low',
-    'close': 'Close',
-    'adjClose': 'AdjClose',
-    'volume': 'Volume'
-})
+# Check if any data was returned
+if data.empty:
+    print(f"❌ No data found for symbol '{symbol}' in the specified date range.")
+else:
+    # --- Data Processing ---
+    # The index is already a DatetimeIndex representing the start time.
+    # We reset the index to turn it into a column.
+    data = data.reset_index()
 
-# Add TimeStart and TimeStop columns
-data['TimeStart'] = data.index
-data['TimeStop'] = data.index + pd.Timedelta(minutes=15)
+    # Rename the timestamp column to 'TimeStart'
+    # The column name can vary ('Datetime' or 'Date'), so we check the first column name
+    timestamp_col_name = data.columns[0]
+    data = data.rename(columns={timestamp_col_name: 'TimeStart'})
 
-# Reorder
-data = data[['TimeStart', 'TimeStop', 'Open', 'High', 'Low', 'Close']]
+    # Add the 'TimeStop' column by adding the interval duration.
+    # We parse the interval string to calculate the timedelta.
+    interval_value = int(interval[:-1])
+    interval_unit = interval[-1]
+    if interval_unit == 'm':
+        time_delta = pd.Timedelta(minutes=interval_value)
+    elif interval_unit == 'h':
+        time_delta = pd.Timedelta(hours=interval_value)
+    else:
+        # Fallback for daily/weekly intervals, though less common for this script
+        time_delta = pd.Timedelta(days=1)
 
-# Save to Excel
-output_file = f'{symbol}_15min_data.xlsx'
-data.to_excel(output_file, index=False)
+    data['TimeStop'] = data['TimeStart'] + time_delta
 
-print(f"✅ Excel file created successfully: {output_file}")
-print(f"Total records fetched: {len(data)}")
+    # Reorder columns to match the desired format
+    # Note: Yahoo Finance column names are already capitalized ('Open', 'High', etc.)
+    data = data[['TimeStart', 'TimeStop', 'Open', 'High', 'Low', 'Close', 'Volume']]
+
+
+    # --- Save to Excel ---
+    output_file = f'{symbol}_{interval}_data_yahoo.xlsx'
+    data.to_excel(output_file, index=False)
+
+    print(f"✅ Excel file created successfully: {output_file}")
+    print(f"Total records fetched: {len(data)}")
 
 
