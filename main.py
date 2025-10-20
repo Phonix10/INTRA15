@@ -27,6 +27,9 @@ for interval in intervals:
     #     print(symbols)
     interval_col_count = 0
     for symbols in df.iloc[:, 1]:
+        if pd.isna(symbols):
+            print("⚠️ Skipping empty symbol entry.")
+            continue
         print(symbols)
         symbol = symbols + ".NS"  # Stock symbol
         # interval = '5m'
