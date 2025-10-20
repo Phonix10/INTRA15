@@ -34,8 +34,22 @@ for interval in intervals:
         os.makedirs(interval_folder, exist_ok=True)
 
         # --- Date Range ---
+
+        # end_date = datetime.now()
+        # start_date = end_date - timedelta(days=60)
         end_date = datetime.now()
-        start_date = end_date - timedelta(days=60)
+
+        if interval in ['5m', '15m', '30m']:
+            start_date = end_date - timedelta(days=60)
+        elif interval == '1h':
+            start_date = end_date - timedelta(days=730)  # 2 years
+        elif interval == '1d':
+            start_date = end_date - timedelta(days=3660)  # 10 years
+        else:
+            start_date = end_date - timedelta(days=365)
+
+
+
 
         print(f"\nFetching {interval} data for {symbol} from {start_date.date()} to {end_date.date()}...")
 
