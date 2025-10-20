@@ -114,3 +114,9 @@ for interval in intervals:
 
     print(f"📊 Total records in {interval} : {interval_col_count}")
     list_interval_col_count.append(interval_col_count)
+
+print(f"Total record in dataset : {total_col}")
+j =0
+for interval in intervals:
+    print(f"📊 Total records in {interval} : {list_interval_col_count[j]}")
+    j += 1
