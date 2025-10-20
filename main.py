@@ -12,7 +12,7 @@ df = pd.read_excel(file_path)
 print("Columns:", df.columns.tolist())  # optional — to verify column names
 
 # List of intervals
-intervals = [ '5m', '15m', '1h', '1d']
+intervals = [ '5m', '15m','30m', '1h', '1d']
 
 # Create base output folder if not exists
 os.makedirs(base_output_dir, exist_ok=True)
@@ -101,8 +101,8 @@ for interval in intervals:
             print(f"📊 Total records: {len(data)}")
             total_col += len(data)
             interval_col_count += len(data)
-            print(total_col)
-            print(interval_col_count)
+            # print(total_col)
+            # print(interval_col_count)
         except PermissionError:
             alt_file = os.path.join(interval_folder, f"{symbol}_{interval}_data{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx")
             data.to_excel(alt_file, index=False)
@@ -112,4 +112,5 @@ for interval in intervals:
             data.to_csv(alt_file, index=False)
             print(f"⚠️ Excel failed ({e}), saved as CSV: {alt_file}")
 
+    print(f"📊 Total records in {interval} : {interval_col_count}")
     list_interval_col_count.append(interval_col_count)
