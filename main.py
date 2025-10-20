@@ -12,16 +12,20 @@ df = pd.read_excel(file_path)
 print("Columns:", df.columns.tolist())  # optional — to verify column names
 
 # List of intervals
-intervals = ['1m', '5m', '15m', '1h', '1d']
+intervals = [ '5m', '15m', '1h', '1d']
 
 # Create base output folder if not exists
 os.makedirs(base_output_dir, exist_ok=True)
+
+total_col = 0
+list_interval_col_count = []
 
 for interval in intervals:
     # Create a subfolder for each interval
 
     # for symbols in df.iloc[:, 1]:
     #     print(symbols)
+    interval_col_count = 0
     for symbols in df.iloc[:, 1]:
         print(symbols)
         symbol = symbols + ".NS"  # Stock symbol
@@ -31,7 +35,7 @@ for interval in intervals:
 
         # --- Date Range ---
         end_date = datetime.now()
-        start_date = end_date - timedelta(days=10000)
+        start_date = end_date - timedelta(days=60)
 
         print(f"\nFetching {interval} data for {symbol} from {start_date.date()} to {end_date.date()}...")
 
@@ -81,6 +85,10 @@ for interval in intervals:
             data.to_excel(output_file, index=False)
             print(f"✅ Saved: {output_file}")
             print(f"📊 Total records: {len(data)}")
+            total_col += len(data)
+            interval_col_count += len(data)
+            print(total_col)
+            print(interval_col_count)
         except PermissionError:
             alt_file = os.path.join(interval_folder, f"{symbol}_{interval}_data{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx")
             data.to_excel(alt_file, index=False)
@@ -89,3 +97,5 @@ for interval in intervals:
             alt_file = os.path.join(interval_folder, f"{symbol}_{interval}_data.csv")
             data.to_csv(alt_file, index=False)
             print(f"⚠️ Excel failed ({e}), saved as CSV: {alt_file}")
+
+    list_interval_col_count.append(interval_col_count)
