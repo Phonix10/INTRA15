@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import os
 
 # --- Configuration ---
-file_path = r"C:\Users\uditr\Downloads\Average MCAP_July2024ToDecember 2024 (1).xlsx"
+file_path = r"C:\Users\uditr\Downloads\all_nse1.xlsx"
 base_output_dir = r"C:\Users\uditr\Allproject\stackdata\stockfloder"   # Main output folder
 
 # Read Excel file
